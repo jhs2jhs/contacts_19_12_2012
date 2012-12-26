@@ -1,0 +1,7 @@
+*copy*
+txt/*
+spss/*
+*.pyc
+*.db
+*.mindnode/*
+*.xlsx
