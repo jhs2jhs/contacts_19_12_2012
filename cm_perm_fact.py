@@ -66,7 +66,7 @@ def perms_fact_awards(apps):
 
     
 sql_perm_fact_apps = '''
-SELECT app_id, developer_href FROM app WHERE developer_href IS NOT NULL
+SELECT app_id, developer_href, category, price, rating_average, rating_total, installs FROM app WHERE developer_href IS NOT NULL
 '''
 def perms_fact_apps(apps):
     print 'perm_fact_apps start'
@@ -76,9 +76,23 @@ def perms_fact_apps(apps):
     while r != None:
         app_id = r[0].encode('utf-8').lower().strip()
         developer_href = r[1].encode('utf-8').lower().strip()
+        category = r[2].encode('utf-8').lower().strip()
+        price = r[3].encode('utf-8').lower().strip()
+        price = price_c(price)
+        rating_average = r[4].replace(',','').encode('utf-8').lower().strip()
+        rating_average = check_none(rating_average, '0')
+        rating_total = r[5].replace(',','').encode('utf-8').lower().strip()
+        rating_total = check_none(rating_total, '0')
+        installs = r[6].encode('utf-8').lower().strip()
+        installs = check_none(installs, '')
         if not apps.has_key(app_id):
             apps[app_id] = {}
         apps[app_id]['developer'] = developer_href
+        apps[app_id]['category'] = category
+        apps[app_id]['price'] = price
+        apps[app_id]['rating_average'] = rating_average
+        apps[app_id]['rating_total'] = rating_total
+        apps[app_id]['installs'] = installs
         r = c.fetchone()
     c.close()
     print 'perms_fact_apps end'
@@ -98,8 +112,11 @@ def perms_fact_perms_print(perms):
                                           
     
 def perms_fact_apps_print(apps, perms):
+    categories = {}
+    f1 = codecs.open('./txt/cm_perm_fact_network.txt', 'w', encoding='utf-8')
+    f1.write('app_id\tcategory_id\tcategory\tperm_id\tperm\tprice\tinstalls\tawards\n')
     f = codecs.open('./txt/cm_perm_fact_apps.txt', 'w', encoding='utf-8')
-    t = u'app_id\tawards\t'
+    t = u'app_id\tcategory\tcategory_id\tprice\trating_average\trating_total\tinstalls\tinstall_min\tinstall_max\tinstall_average\tawards\tawards_type\tdeveloper\t'
     for perm in perms:
         perm_id = perms[perm]
         t = u'%s%s\t'%(t, perm_id)
@@ -113,13 +130,27 @@ def perms_fact_apps_print(apps, perms):
         if developer_href == '' or developer_href == None:
             continue
         t = u'%s\t'%(app_id)
+        category = app['category']
+        if not categories.has_key(category):
+            categories[category] = unicode(len(categories)+1)
+        category_id = categories[category]
+        price = app['price']
+        rating_average = app['rating_average']
+        rating_total = app['rating_total']
+        installs = app['installs']
+        installs, install_min, install_max, install_average = installs_c(installs)
+        developer_href = app['developer']
+        t = u'%s%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t'%(t, category, category_id, price, rating_average, rating_total, installs, install_min, install_max, install_average, developer_href)
+        app_awards = ''
         if not app.has_key('awards'):
-            t = u'%s%s\t'%(t, 'none')
+            t = u'%s%s\t%s\t'%(t, '0', '0')
+            app_awards = 'none'
         else:
             awards = app['awards']
             for award in awards:
                 t = u'%s%s+'%(t, award)
-            t = u'%s\t'%(t)
+                app_awards = '%s&%s'%(app_awards, award)
+            t = u'%s\t1\t'%(t)
         if not app.has_key('perms'):
             ps = {}
         else: 
@@ -130,9 +161,17 @@ def perms_fact_apps_print(apps, perms):
             flag = '0' # false
             if ps.has_key(perm_id):
                 flag = '1' # true
+                f1.write(u'%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n'%(app_id, category_id, category, perm_id, perm, price, installs, app_awards))
             t = u'%s%s\t'%(t, flag)
         t = u'%s\n'%(t)
         f.write(t)
+    f1.close()
+    f.close()
+    f = codecs.open('./txt/cm_perm_fact_categories.txt', 'w', encoding='utf-8')
+    f.write('category_id\tcategory\n')
+    for category in categories:
+        category_id = categories[category]
+        f.write(u'%s\t%s\n'%(unicode(category_id), category))
     f.close()
     print 'perms_fact_apps_print end'
             
@@ -218,8 +257,8 @@ if __name__ == '__main__':
     apps = perms_fact_apps(apps)
     perms_fact_perms_print(perms)
     perms_fact_apps_print(apps, perms)
-    developers = {}
-    developers = perms_fact_developers(apps, developers)
-    perms_fact_developers_print(developers)
+    #developers = {}
+    #developers = perms_fact_developers(apps, developers)
+    #perms_fact_developers_print(developers)
     #print developers
     

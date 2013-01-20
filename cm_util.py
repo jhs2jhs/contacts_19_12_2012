@@ -97,3 +97,41 @@ def d_zero(m, n):
         return 0
     k = m*1.0/n
     return k
+
+
+def price_c(price):
+    if price == 'install':
+        price = '0'
+    else:
+        if not ('$' in price or '£' in price or '¥' in price):
+            if price == '':
+                price = '0'
+            print price
+        else:
+            if '¥' in price:
+                prices = price.split('¥')
+                prices[1] = unicode(float(prices[1]) /10)
+                print price, prices
+            if '$' in price:
+                prices = price.split('$')
+                print price, prices
+            if '£' in price:
+                prices = price.split('£')
+            price = prices[1]
+    return price
+
+def installs_c(installs):
+    if '-' not in installs:
+        #print installs, 0, 0
+        install_min = 0
+        install_max = 0
+        installs = '0 - 0'
+        install_average = '0'
+    else:
+        install = installs.split('-')
+        install_min = install[0].replace(',', '').strip()
+        install_max = install[1].replace(',', '').strip()
+        install_average = str((int(install_min) + int(install_max))/2)
+        install_min = check_none(install_min, '0')
+        install_max = check_none(install_max, '0')
+    return installs, install_min, install_max, install_average
