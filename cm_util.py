@@ -22,6 +22,19 @@ CREATE TABLE IF NOT EXISTS app_contact (
   app_id TEXT NOT NULL UNIQUE,
   perm TEXT -- cr, cw, pr, pw, sr, sw
 );
+CREATE TABLE IF NOT EXISTS perm_ids (
+  perm_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+  perm_original TEXT NOT NULL,
+  perm_lower TEXT NOT NULL UNIQUE
+);
+CREATE TABLE IF NOT EXISTS app_perm (
+  permission_id INTEGER UNIQUE,
+  app_id TEXT NOT NULL,
+  perm_id TEXT NOT NULL,
+  perm_individual TEXT NOT NULL,
+  perm_lower TEXT NOT NULL,
+  UNIQUE (app_id, perm_id)
+)
 '''
 
 c = db.cursor()
@@ -135,3 +148,12 @@ def installs_c(installs):
         install_min = check_none(install_min, '0')
         install_max = check_none(install_max, '0')
     return installs, install_min, install_max, install_average
+
+
+########
+def p_percent(p, i, i_t, percent):
+    if i >= int(i_t*p/100):
+        print '\t'+str(p)+'%'+'..'
+        p = p + percent
+    i = i + 1
+    return p, i
