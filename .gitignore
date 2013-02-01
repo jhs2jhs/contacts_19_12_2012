@@ -5,3 +5,4 @@ spss/*
 *.db
 *.mindnode/*
 *.xlsx
+*.db-journal*

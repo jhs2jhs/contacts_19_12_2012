@@ -28,13 +28,18 @@ CREATE TABLE IF NOT EXISTS perm_ids (
   perm_lower TEXT NOT NULL UNIQUE
 );
 CREATE TABLE IF NOT EXISTS app_perm (
-  permission_id INTEGER UNIQUE,
+  permission_id INTEGER,
   app_id TEXT NOT NULL,
   perm_id TEXT NOT NULL,
   perm_individual TEXT NOT NULL,
   perm_lower TEXT NOT NULL,
   UNIQUE (app_id, perm_id)
-)
+);
+CREATE TABLE IF NOT EXISTS categories_ids (
+  cate_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+  cate_original TEXT NOT NULL,
+  cate_lower TEXT NOT NULL UNIQUE
+);
 '''
 
 c = db.cursor()
