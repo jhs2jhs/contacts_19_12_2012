@@ -199,6 +199,7 @@ def contact_share(apps):
             apps[app_id] = {}
         if not apps[app_id].has_key('share'):
             apps[app_id]['share'] = {}
+        google_plus_figure = figures(google_plus_figure, 'k', 1000)
         apps[app_id]['share']['google_plus'] = google_plus_figure
         r = c.fetchone()
     c.close()
@@ -383,6 +384,7 @@ def contact_apps_print(apps):
         ### 
         if app.has_key('share'):
             google_plus_figure = check_none(app['share']['google_plus'], '0')
+            ## i already process k out in apps_awards()
             google_plus_figure = figures(google_plus_figure, 'k', 1000)
         else:
             google_plus_figure = 'none'

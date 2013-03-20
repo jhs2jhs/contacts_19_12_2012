@@ -89,6 +89,14 @@ def yes_no(v):
             return '0'
         else:
             return '1'
+def yes_no_num(v):
+    if v == None:
+        return '0'
+    else:
+        if len(v) > 0:
+            return '1'
+        else:
+            return '0'
 def contact_level(perms):
     s = 0
     i = 0

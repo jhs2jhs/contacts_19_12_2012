@@ -3,6 +3,7 @@
 
 from cm_util import *
 from cm_contacts import *
+import cm_perm_fact
 
 import sys
 print sys.getdefaultencoding()
@@ -19,7 +20,7 @@ def developers_apps(apps, developers):
     print 'developers_apps start'
     for app_id in apps:
         app = apps[app_id]
-        if not app.has_key('developers'):
+        if not app.has_key('developer'):
             continue
         #rating_total = check_none(app['rating_total'], 'none')
         #if rating_total == 'none':
@@ -27,8 +28,9 @@ def developers_apps(apps, developers):
         #rating_average = check_none(app['rating_average'], 'none')
         #if rating_average == 'none':
         #    continue
-        developer = app['developers']
-        developer_href = check_none(developer['developer_href'], 'none')
+        developer_href = app['developer']
+        if developer_href == '' or developer_href == None:
+            continue
         if not developers.has_key(developer_href):
             developers[developer_href] = {}
         developers[developer_href][app_id] = app
@@ -48,6 +50,10 @@ def developers_apps(apps, developers):
 
 def developers_apps_print(developers):
     print 'developer_apps_print start'
+    f1 = codecs.open('./txt/cm_developer_contact.txt', 'w', encoding='utf-8')
+    f1.write('%s\t%s\t%s\t%s\t%s\t%s\t%s\t'%('dev_href', 'apps_len', 'apps_r_a', 'contact_has', 'category_len', 'privacy_has', 'con_apps_type'))
+    f1.write('%s\t%s\t%s\t%s\t'%('con_apps_r_a', 'con_apps_r', 'con_apps', 'con_apps_cat_len'))
+    f1.write('\n')
     f = codecs.open('./txt/cm_developer.txt', 'w', encoding='utf-8')
     f.write('%s\t%s\t%s\t%s\t%s\t%s\t'%('dev_href', 'apps_len', 'apps_r_a', 'contact_has', 'category_len', 'privacy_has'))
     f.write('%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t'%('con_apps_r_a', 'con_apps_r_no_a', 'con_apps_r', 'con_apps_r_no', 'con_apps', 'con_apps_no', 'con_apps_cat_len', 'con_apps_cat_no'))
@@ -90,16 +96,16 @@ def developers_apps_print(developers):
             apps_rating += rating_average
             category = check_none(app['category'], 'none')
             categories[category] = 1
-            developer_privacy = check_none(app['developers']['developer_privacy'], 'none')
-            if not developer_privacy == 'none':
+            developer_privacy = check_none(app['developer_privacy'], 'none')
+            if not developer_privacy == 'none' and not developer_privacy == '0':
                 privacy_has = 1
                 privacy_apps += 1
                 privacy_apps_rating += rating_average
             else:
                 privacy_apps_no += 1
                 privacy_apps_rating_no += rating_average
-            developer_website = check_none(app['developers']['developer_website'], 'none')
-            if not developer_website == 'none':
+            developer_website = check_none(app['developer_website'], 'none')
+            if not developer_website == 'none' and not developer_website == '0':
                 website_has = 1
                 website_apps += 1
                 website_apps_rating += rating_average
@@ -113,17 +119,11 @@ def developers_apps_print(developers):
             else:
                 video_apps_no += 1
                 video_apps_rating_no += rating_average
-            if app.has_key('perms') and app['perms'].has_key('contact_perms'):
-                contact_perms = app['perms']['contact_perms']
-                if 'c' in contact_perms:
-                    contact_apps += 1
-                    contact_apps_rating += rating_average
-                    contact_has = 1
-                    contact_apps_category[category] = 1
-                else:
-                    contact_apps_no += 1
-                    contact_apps_rating_no += rating_average
-                    contact_apps_category_no[category] = 1
+            if app.has_key('contact_perms'):
+                contact_apps += 1
+                contact_apps_rating += rating_average
+                contact_has = 1
+                contact_apps_category[category] = 1
             else:
                 contact_apps_no += 1
                 contact_apps_rating_no += rating_average
@@ -146,18 +146,29 @@ def developers_apps_print(developers):
         t = u'%s%s\t%s\t%s\t%s\t%s\t%s\t'%(t, website_apps_rating, website_apps_rating_no, website_apps, website_apps_no, website_apps_rating_average, website_apps_rating_no_average)
         t = u'%s\n'%(t)
         f.write(t)
+        if contact_has = 0 or contact_has == '0':
+            continue
+        t1 = u''
+        t1 = u'%s%s\t%s\t%s\t%s\t%s\t%s\t1\t'%(t1, developer_href, apps_len, apps_rating_average, contact_has, category_len, privacy_has)
+        t1 = u'%s%s\t%s\t%s\t%s\t'%(t1, contact_apps_rating_average, contact_apps_rating, contact_apps, len(contact_apps_category))
+        t1 = u'%s\n'%(t1)
+        t1 = u'%s%s\t%s\t%s\t%s\t%s\t%s\t0\t'%(t1, developer_href, apps_len, apps_rating_average, contact_has, category_len, privacy_has)
+        t1 = u'%s%s\t%s\t%s\t%s\t'%(t1, contact_apps_rating_no_average, contact_apps_rating_no, contact_apps_no, len(contact_apps_category_no))
+        t1 = u'%s\n'%(t1)
+        f.write(t)
     f.close()
+    f1.close()
     print 'developer_print_apps end'
 
 if __name__ == "__main__":
     #app_contact_init()
     apps = {}
-    apps = contact_permission(apps)
-    apps = app_permission(apps)
+    #apps = contact_permission(apps)
+    apps = cm_perm_fact.perms_fact_perms(apps) #apps = app_permission(apps)
     apps = contact_videos(apps)
-    apps = contact_awards(apps)
+    apps = cm_perm_fact.perms_fact_awards(apps) #apps = contact_awards(apps)
     apps = contact_share(apps)
-    apps = contact_app(apps)
+    apps = cm_perm_fact.perms_fact_apps(apps) #apps = contact_app(apps)
     developers = {}
     developers = developers_apps(apps, developers)
     developers_apps_print(developers)
