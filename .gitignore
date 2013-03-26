@@ -6,3 +6,6 @@ spss/*
 *.mindnode/*
 *.xlsx
 *.db-journal*
+
+txt/*
+txt*/*
