@@ -203,12 +203,12 @@ def get_deviance(perms_picj, categories, perms, illegimates):
                 fs[c_id] = {}
             if not fs[c_id].has_key(fp_type):
                 fs[c_id][fp_type] =  codecs.open('./txt_centr/picj_o/d_p%sc%s.txt'%(fp_type, c_id), 'w', encoding='utf-8')
-                fs[c_id][fp_type].write(u'p_id\td_degree\td_closeness\td_betweenness\tillegimate_type\tp_label\tp_type\n')
+                fs[c_id][fp_type].write(u'p_id\td_degree\td_closeness\td_betweenness\tillegimate_type\tp_label\tp_type\tabsence\n')
     for p_id in perms_all_classess:
         pid = p_id.split('_')[1].strip()
         pid = int(pid)
-        if pid in [29, 36, 39, 41, 50, 52, 54, 57, 58, 60, 62, 63, 65, 68, 69, 71, 72, 73, 75, 79, 80, 82, 85, 86, 87, 88, 89, 90, 93, 94, 95, 97, 98, 99]:
-            continue
+        #if pid in [29, 36, 39, 41, 50, 52, 54, 57, 58, 60, 62, 63, 65, 68, 69, 71, 72, 73, 75, 79, 80, 82, 85, 86, 87, 88, 89, 90, 93, 94, 95, 97, 98, 99]:
+        #    continue
         p_label = 'none'
         p_type = 'other'
         if perms.has_key(p_id):
@@ -226,6 +226,9 @@ def get_deviance(perms_picj, categories, perms, illegimates):
                 stddev_d = perms_picj[c_id][fp_type]['stddev_d']
                 stddev_c = perms_picj[c_id][fp_type]['stddev_c']
                 stddev_b = perms_picj[c_id][fp_type]['stddev_b']
+                if not perms_all_classess[p_id].has_key(fp_type):
+                    #print p_id, fp_type
+                    continue
                 all_d = perms_all_classess[p_id][fp_type]['degree']
                 all_c = perms_all_classess[p_id][fp_type]['closeness']
                 all_b = perms_all_classess[p_id][fp_type]['betweenness']
@@ -234,15 +237,17 @@ def get_deviance(perms_picj, categories, perms, illegimates):
                     d = 0
                     c = 0
                     b = 0
+                    absence = 'yes'
                 else:
                     d = perms_picj[c_id][fp_type][p_id]['degree']
                     c = perms_picj[c_id][fp_type][p_id]['closeness']
                     b = perms_picj[c_id][fp_type][p_id]['betweenness']
+                    absence = 'no'
                 deviance_d = (d - all_d)/stddev_d
                 deviance_c = (c - all_c)/stddev_c
                 deviance_b = (b - all_b)/stddev_b
                 #print deviance_d, deviance_c, deviance_b
-                t = u'%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n'%(p_id, deviance_d, deviance_c, deviance_b, is_illegimate, p_label, p_type)
+                t = u'%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n'%(p_id, deviance_d, deviance_c, deviance_b, is_illegimate, p_label, p_type, absence)
                 fs[c_id][fp_type].write(t)
     for c_id in fs:
         for fp_type in fs[c_id]:

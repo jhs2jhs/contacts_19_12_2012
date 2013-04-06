@@ -9,3 +9,5 @@ spss/*
 
 txt/*
 txt*/*
+
+#*.py#

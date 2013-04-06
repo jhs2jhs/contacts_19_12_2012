@@ -107,7 +107,7 @@ def perms_fact_awards(apps):
 # do not have rating_0 - rating_5
 sql_perm_fact_apps = '''
 SELECT app_id, developer_href, category, price, rating_average, rating_total, installs, 
-developer_website, developer_email, developer_privacy, title, desc 
+developer_website, developer_email, developer_privacy, title, desc, rank 
 FROM app WHERE developer_href IS NOT NULL 
 '''
 def perms_fact_apps(apps):
@@ -157,6 +157,8 @@ def perms_fact_apps(apps):
         if u'theme' in app_desc or u'wallpaper' in app_desc :
             apps[app_id]['theme_app'] = '3'
         apps[app_id]['app_title'] = app_title
+        rank = r[12].encode('utf-8').strip().lower()
+        apps[app_id]['rank'] = rank
         r = c.fetchone()
     c.close()
     print 'perms_fact_apps end', len(apps)
@@ -167,7 +169,7 @@ def perms_fact_apps_print(apps, categories, p_maps):
     #f1 = codecs.open('./txt/cm_perm_fact_network.txt', 'w', encoding='utf-8')
     #f1.write('app_id\tcategory_id\tcategory\tperm_id\tperm\tprice\tinstalls\tawards\n')
     f = codecs.open('./txt/cm_perm_fact_apps.txt', 'w', encoding='utf-8')
-    t = u'app_id\tcategory\tcategory_id\tprice\trating_average\trating_total\tinstalls\tinstall_min\tinstall_max\tinstall_average\tdeveloper\tdeveloper_website\tdeveloper_email\tdeveloper_privacy\tyoutube_has\tyoutube_view_total\tgoogle_plus\tawards\tawards_type\tawards_count\ttheme_app\tperm_counts\t'
+    t = u'app_id\tcategory\tcategory_id\tprice\trating_average\trating_total\tinstalls\tinstall_min\tinstall_max\tinstall_average\tdeveloper\tdeveloper_website\tdeveloper_email\tdeveloper_privacy\tyoutube_has\tyoutube_view_total\tgoogle_plus\tawards\tawards_type\tawards_count\ttheme_app\tperm_counts\trank\t'
     ''' perm code index system using in jian's original dataset
     for perm_id in perms:
         perm_lower = perms[perm_id]
@@ -238,6 +240,10 @@ def perms_fact_apps_print(apps, categories, p_maps):
             perm_counts = len(ps)
             #print ps
         t = u'%s%s\t'%(t, str(perm_counts))
+        rank = '-2'
+        if not app.has_key('rank'):
+            rank = app['rank']
+        t = u'%s%s\t'%(t, str(rank))
         ''' perm code system: jian's orignal 
         for perm_id in perms:
             perm_lower = perms[perm_id]
