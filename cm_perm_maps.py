@@ -14,6 +14,7 @@ import codecs
 print "start"
 db = sqlite3.connect('db_app.db')
 
+# google p_id => google p_label
 def p_map_import(p_maps):
     print '== p_map_import'
     p = './txt/perm_jian_input.txt'
@@ -33,6 +34,7 @@ def p_map_import(p_maps):
     return p_maps
 
 #################
+# # orignal perm_id => google perm_id
 def perm_map_import(perm_maps):
     print '== perm_map_import'
     p = './txt/perm_jian_input.txt'

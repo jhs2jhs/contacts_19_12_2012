@@ -172,6 +172,10 @@ def category_get(categories):
     while r != None:
         cate_id = r[0]
         cate_lower = r[1]
+        if cate_lower == 'arcade & action':
+            cate_lower = 'arcade and action'
+        if cate_lower == 'cards & casino':
+            cate_lower = 'cards and casino'
         if not categories.has_key(cate_id):
             categories[cate_lower] = cate_id
         r = c.fetchone()
